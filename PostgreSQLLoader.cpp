@@ -107,8 +107,8 @@ void PostgreSQLLoader::addNodesToGraph(DijkstraGraph *graph, int64_t osm_id,
 
 void PostgreSQLLoader::saveClassDistances(DijkstraGraph *graph) {
     int c = 0;
-    for( auto it = graph->nodes_id.begin();
-            it != graph->nodes_id.end();
+    for( auto it = graph->nodes.begin();
+            it != graph->nodes.end();
             ++it ) {
         for( auto it2 = it->second->other_nodes.begin();
                 it2 != it->second->other_nodes.end();
