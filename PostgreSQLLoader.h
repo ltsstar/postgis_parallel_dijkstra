@@ -21,11 +21,11 @@ private:
 public:
     PostgreSQLLoader ();
     ~PostgreSQLLoader();
-    DijkstraGraph loadStreets();
+    DijkstraGraph * loadStreets();
     std::vector<std::array<double, 2>> getCoordinatesFromLineString(std::string line_string);
     void addNodesToGraph(DijkstraGraph *graph, int64_t osm_id, std::vector<std::array<double, 2>> coordinates);
 
     void saveClassDistances(DijkstraGraph *graph);
-    void updatePostgresLine(int64_t osm_id, int32_t dijkstra_class, int32_t dijkstra_distance);
+    void insertPostgresLine(DijkstraNode* first_node, DijkstraNode* second_node);
 };
 #endif //PARALLEL_DIJKSTRA_POSTGRESQLLOADER_H

@@ -6,18 +6,18 @@
 #include "DijkstraNode.h"
 
 void DijkstraGraph::addNode(DijkstraNode * node) {
-    this->nodes.insert( std::pair<node_cord, DijkstraNode *>(node->cord, node));
+    this->nodes.insert( std::pair<NodeCord, DijkstraNode *>(node->cord, node) );
+    this->nodes_id.insert( std::pair<nodeID, DijkstraNode *>(node->id, node) );
 }
 
 DijkstraNode* DijkstraGraph::getNode(int64_t osm_id) {
-    for( auto node = this->nodes.begin();
-         node != this->nodes.end();
-         ++node ) {
-        if( node->second->id.osm_id == osm_id ) {
-            return node->second;
+    for(int i=0; i<100; i++) { //very bad style
+        nodeID node_id = nodeID(osm_id, i);
+        if (nodes_id.find(node_id) != nodes_id.end()) {
+            DijkstraNode *node = nodes_id.find(node_id)->second;
+            return node;
         }
     }
-    return nullptr;
 }
 
 DijkstraNode * DijkstraGraph::makeNodeStarting(int64_t osm_id, uint32_t dijkstra_class) {
@@ -28,4 +28,9 @@ DijkstraNode * DijkstraGraph::makeNodeStarting(int64_t osm_id, uint32_t dijkstra
         return node;
     }
     return nullptr;
+}
+
+DijkstraGraph::DijkstraGraph() {
+    nodes = std::map<NodeCord, DijkstraNode*>();
+    nodes_id = std::map<nodeID, DijkstraNode*>();
 }

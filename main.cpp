@@ -3,9 +3,14 @@
 #include "ParallelDijkstra.h"
 #include "DijkstraNode.h"
 
+/*
+ * sometimes an osm_id doesn't exist, because it has been overriden by a connected street. In this case,
+ * try another osm id!
+ */
+
 int main() {
     PostgreSQLLoader postgreSQLLoader;
-    DijkstraGraph dijkstraGraph = postgreSQLLoader.loadStreets();
+    DijkstraGraph * dijkstraGraph = postgreSQLLoader.loadStreets();
 
     /*
     for(auto it = dijkstraGraph.nodes.begin();
@@ -20,25 +25,27 @@ int main() {
         }
         std::cout << "]" << std::endl;
     }
-    */
 
 
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
             {162089319, 1337}, // Copenhagen
             {117938010, 4444}  // Skagen
     };
+         */
 
-    /*
+
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
-            {572205983, 1337}, // Schaan
-            {43327662, 4444}  // Balzers
+            {43327662, 4444},  // Balzers
+            {46923267, 1337}, // Schaan
     };
 
-    std::cout << "Schaan Klasse " << dijkstraGraph.getNode(32699970)->distance << "," << dijkstraGraph.getNode(32699970)->dijkstra_class << std::endl;
-    std::cout << "Reihnndamm (Balzers) " <<dijkstraGraph.getNode(6078883)->distance << "," << dijkstraGraph.getNode(6078883)->dijkstra_class << std::endl;
-    */
 
-    ParallelDijkstra parallelDijkstra = ParallelDijkstra(dijkstraGraph, starting_nodes);
+    ParallelDijkstra(dijkstraGraph, starting_nodes);
+
+    //std::cout << "Schaan Klasse " << dijkstraGraph->getNode(32699970)->distance << "," << dijkstraGraph->getNode(32699970)->dijkstra_class << std::endl;
+    //std::cout << "Reihnndamm (Balzers) " <<dijkstraGraph->getNode(6078883)->distance << "," << dijkstraGraph->getNode(6078883)->dijkstra_class << std::endl;
+
+
 
     /*
     int64_t bested_thy = 101987997;
@@ -54,7 +61,10 @@ int main() {
     std::cout << dijkstraGraph.getNode(aalborg)->distance << "," << dijkstraGraph.getNode(aalborg)->dijkstra_class << std::endl;
     std::cout << dijkstraGraph.getNode(kopenhagen)->distance << "," << dijkstraGraph.getNode(kopenhagen)->dijkstra_class << std::endl;
     */
-    postgreSQLLoader.saveClassDistances(&dijkstraGraph);
+    NodeCord cord = NodeCord(470572862, 94792829);
+
+    DijkstraNode * node = dijkstraGraph->nodes.find(cord)->second;
+    postgreSQLLoader.saveClassDistances(dijkstraGraph);
 
     return 0;
 }

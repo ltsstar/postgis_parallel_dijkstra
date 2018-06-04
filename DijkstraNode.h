@@ -8,12 +8,25 @@
 #include <stdint.h>
 #include <vector>
 
-typedef struct {int64_t osm_id; uint32_t sub_id;} nodeID;
-bool operator< (const nodeID a, const nodeID b);
+typedef struct nodeID {
+    int64_t osm_id;
+    uint32_t sub_id;
+    bool operator< (const nodeID& b) const;
+    bool operator== (const nodeID& b) const;
+    nodeID(const nodeID &node_id);
+    nodeID(int64_t osm_id, uint32_t sub_id);
+} nodeID;
 
-typedef struct {uint32_t lat; uint32_t lon;} node_cord;
-bool operator< (const node_cord a, const node_cord b);
-bool operator== (const node_cord a, const node_cord b);
+typedef struct NodeCord {
+    uint32_t lat;
+    uint32_t lon;
+    bool operator< (const NodeCord& b) const;
+    bool operator== (const NodeCord& b) const;
+    NodeCord(const NodeCord &b);
+    NodeCord(uint32_t lon, uint32_t lat);
+    NodeCord();
+} NodeCord;
+
 
 class DijkstraNode {
 private:
@@ -21,15 +34,20 @@ private:
     uint32_t wgs84_lon_to_int(double lon);
 public:
     nodeID id;
-    node_cord cord;
+    NodeCord cord;
     uint32_t dijkstra_class;
     uint32_t distance;
     bool marked;
     std::vector<DijkstraNode *> other_nodes;
 
+    double wgs84_lat();
+    double wgs84_lon();
+
     void addEdge(DijkstraNode *other_node);
     void addBidirectional(DijkstraNode *other_node);
     DijkstraNode(nodeID id, double wgs_lat, double wgs_lon);
+    DijkstraNode(const DijkstraNode &dijkstra_node);
+    ~DijkstraNode();
 };
 
 

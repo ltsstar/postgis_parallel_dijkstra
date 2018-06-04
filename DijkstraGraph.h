@@ -13,10 +13,12 @@
 class DijkstraGraph {
 private:
 public:
-    std::map<node_cord, DijkstraNode*> nodes;
+    std::map<NodeCord, DijkstraNode*> nodes;
+    std::map<nodeID, DijkstraNode*> nodes_id;
     void addNode(DijkstraNode * node);
     DijkstraNode* getNode(int64_t osm_id);
     DijkstraNode * makeNodeStarting(int64_t osm_id, uint32_t dijkstra_class);
+    DijkstraGraph();
 };
 
 

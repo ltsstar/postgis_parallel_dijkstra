@@ -11,10 +11,10 @@
 
 class ParallelDijkstra {
 private:
-    DijkstraGraph dijkstraGraph;
+    DijkstraGraph * dijkstraGraph;
     std::vector<DijkstraNode*> node_heap;
 public:
-    ParallelDijkstra(DijkstraGraph dijkstraGraph, std::vector<std::pair<int64_t, uint32_t>> starting_nodes);
+    ParallelDijkstra(DijkstraGraph * dijkstraGraph, std::vector<std::pair<int64_t, uint32_t>> starting_nodes);
     void ProcessHeap();
     void scansuc(DijkstraNode * node);
     uint32_t distance(DijkstraNode node1, DijkstraNode node2);

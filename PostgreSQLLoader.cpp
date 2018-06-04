@@ -7,8 +7,7 @@
 #include "PostgreSQLLoader.h"
 #include "DijkstraNode.h"
 
-
-std::string PostgreSQLLoader::db_name = "gis";
+std::string PostgreSQLLoader::db_name = "gis_liechtenstein";
 std::string PostgreSQLLoader::user_name = "michel";
 
 PostgreSQLLoader::PostgreSQLLoader() {
@@ -27,12 +26,13 @@ PostgreSQLLoader::~PostgreSQLLoader() {
     PQfinish(conn);
 }
 
-DijkstraGraph PostgreSQLLoader::loadStreets() {
-    DijkstraGraph dijkstraGraph = DijkstraGraph();
+DijkstraGraph* PostgreSQLLoader::loadStreets() {
+    DijkstraGraph * dijkstraGraph = new DijkstraGraph();
 
     PGresult *res;
     if (!PQsendQuery(conn,
-                     "select osm_id, st_astext(st_transform(way, 4326)) from planet_osm_line where highway is not null"))
+                     "select osm_id, st_astext(st_transform(way, 4326)) from planet_osm_line where highway is not null \
+                     and osm_id > 0"))
     {
         fprintf(stderr, "Send query failed: %s", PQerrorMessage(conn));
         PQfinish(conn);
@@ -47,7 +47,7 @@ DijkstraGraph PostgreSQLLoader::loadStreets() {
             osm_id = std::stoull(PQgetvalue(res, i, 0));
             way = PQgetvalue(res, i, 1);
             std::vector<std::array<double, 2>> coordinates = this->getCoordinatesFromLineString(std::string(way));
-            this->addNodesToGraph(&dijkstraGraph, osm_id, coordinates);
+            this->addNodesToGraph(dijkstraGraph, osm_id, coordinates);
         }
         PQclear(res);
         res = PQgetResult(conn);
@@ -78,14 +78,13 @@ std::vector<std::array<double, 2>> PostgreSQLLoader::getCoordinatesFromLineStrin
 void PostgreSQLLoader::addNodesToGraph(DijkstraGraph *graph, int64_t osm_id,
                                        std::vector<std::array<double, 2>> coordinates) {
     uint32_t sub_id = 0;
-    DijkstraNode *last_node;
+    DijkstraNode *last_node = nullptr;
     for(auto it = coordinates.begin();
         it != coordinates.end();
         ++it) {
 
-        nodeID node_id;
-        node_id.osm_id = osm_id;
-        node_id.sub_id = sub_id;
+        nodeID node_id = nodeID(osm_id, sub_id);
+
         DijkstraNode *node = new DijkstraNode(node_id, (*it)[0], (*it)[1]);
 
         // check if node exists in graph (== intersection)
@@ -94,45 +93,54 @@ void PostgreSQLLoader::addNodesToGraph(DijkstraGraph *graph, int64_t osm_id,
             // node exists, don't add new
             delete node;
             node = graph_it->second;
+        } else {
+            graph->addNode(node);
         }
-
-        if(it != coordinates.begin()) {
+        if(last_node != nullptr) {
             node->addBidirectional(last_node);
+            sub_id++;
         }
 
-        graph->addNode(node);
         last_node = node;
-        sub_id++;
     }
-
 }
 
 void PostgreSQLLoader::saveClassDistances(DijkstraGraph *graph) {
     int c = 0;
-    for( auto it = graph->nodes.begin();
-            it != graph->nodes.end();
+    for( auto it = graph->nodes_id.begin();
+            it != graph->nodes_id.end();
             ++it ) {
-        if( it->second->id.sub_id == 0) {
-            this->updatePostgresLine(it->second->id.osm_id, it->second->dijkstra_class, it->second->distance);
-        } else {
-            continue;
+        for( auto it2 = it->second->other_nodes.begin();
+                it2 != it->second->other_nodes.end();
+                ++it2) {
+            if(it->second->cord < (*it2)->cord) {
+                c++;
+                this->insertPostgresLine(it->second, *it2);
+            }
         }
     }
-    if (!PQsendQuery(this->conn, "COMMIT"))
-    {
-        fprintf(stderr, "Send query failed: %s", PQerrorMessage(conn));
-        PQfinish(conn);
-        exit(1);
-    }
+    std::cout << graph->nodes_id.size() << " size" << std::endl;
+    std::cout << c << " insertions" << std::endl;
 }
 
-void PostgreSQLLoader::updatePostgresLine(int64_t osm_id, int32_t dijkstra_class, int32_t dijkstra_distance) {
+void PostgreSQLLoader::insertPostgresLine(DijkstraNode* first_node, DijkstraNode* second_node) {
     PGresult *res;
-    char query_str[200];
-    sprintf(query_str,
-            "update planet_osm_line set dijkstra_class=%d where osm_id=%d",
-            dijkstra_class, osm_id);
+    char query_str[512];
+    if (first_node->dijkstra_class == second_node->dijkstra_class) {
+        double y1 = first_node->wgs84_lon();
+        double x1 = first_node->wgs84_lat();
+        double y2 = second_node->wgs84_lon();
+        double x2 = second_node->wgs84_lat();
 
+        sprintf(query_str,
+                "insert into dijkstra_lines VALUES (%d, %d, %d,"
+                "ST_SetSRID(ST_MakeLine(ST_Point(%lf, %lf), ST_Point(%lf, %lf)), 4326)"
+                ");",
+                first_node->id.osm_id, first_node->id.sub_id, first_node->dijkstra_class,
+                x1, y1, x2, y2);
+    } else {
+        return;
+    }
     res = PQexec(this->conn, query_str);
     if (!res)
     {

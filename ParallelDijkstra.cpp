@@ -6,13 +6,13 @@
 #include "ParallelDijkstra.h"
 #include "DijkstraNode.h"
 
-ParallelDijkstra::ParallelDijkstra(DijkstraGraph dijkstraGraph, std::vector<std::pair<int64_t, uint32_t>> starting_nodes) :
+ParallelDijkstra::ParallelDijkstra(DijkstraGraph * dijkstraGraph, std::vector<std::pair<int64_t, uint32_t>> starting_nodes) :
         dijkstraGraph(dijkstraGraph)
 {
     for(auto it = starting_nodes.begin();
             it != starting_nodes.end();
             ++it) {
-        DijkstraNode *node = this->dijkstraGraph.makeNodeStarting((*it).first, (*it).second);
+        DijkstraNode *node = this->dijkstraGraph->makeNodeStarting((*it).first, (*it).second);
         this->node_heap.push_back(node);
     }
     this->ProcessHeap();
