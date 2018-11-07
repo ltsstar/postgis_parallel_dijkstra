@@ -12,6 +12,13 @@ int main() {
     PostgreSQLLoader postgreSQLLoader;
     DijkstraGraph * dijkstraGraph = postgreSQLLoader.loadStreets();
 
+    // DANMARK?
+    /*
+    dijkstraGraph->getNode(339513180)->addBidirectional(
+            dijkstraGraph->getNode(12724420)
+    );
+     */
+
     /*
     for(auto it = dijkstraGraph.nodes.begin();
             it != dijkstraGraph.nodes.end();
@@ -25,19 +32,24 @@ int main() {
         }
         std::cout << "]" << std::endl;
     }
-
+*/
+    /*
 
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
+            {117938010, 4444},  // Skagen
             {162089319, 1337}, // Copenhagen
-            {117938010, 4444}  // Skagen
     };
-         */
+     */
+
+
 
 
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
+            //{46923267, 1337}, // Schaan
             {43327662, 4444},  // Balzers
-            {46923267, 1337}, // Schaan
+            {437322836, 9999}, //Mauren
     };
+
 
 
     ParallelDijkstra(dijkstraGraph, starting_nodes);
@@ -61,9 +73,6 @@ int main() {
     std::cout << dijkstraGraph.getNode(aalborg)->distance << "," << dijkstraGraph.getNode(aalborg)->dijkstra_class << std::endl;
     std::cout << dijkstraGraph.getNode(kopenhagen)->distance << "," << dijkstraGraph.getNode(kopenhagen)->dijkstra_class << std::endl;
     */
-    NodeCord cord = NodeCord(470572862, 94792829);
-
-    DijkstraNode * node = dijkstraGraph->nodes.find(cord)->second;
     postgreSQLLoader.saveClassDistances(dijkstraGraph);
 
     return 0;
