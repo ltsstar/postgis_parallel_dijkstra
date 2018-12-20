@@ -5,4 +5,4 @@ CREATE TABLE voronoi_cells (
 	class INT
 	/* PRIMARY KEY(osm_id, sub_id) */
 );
-SELECT AddGeometryColumn ('voronoi_cells','poly',4326,'LINESTRING',2);
+SELECT AddGeometryColumn ('voronoi_cells','poly',4326,'POLYGON',2);

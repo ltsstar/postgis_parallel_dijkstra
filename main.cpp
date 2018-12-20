@@ -33,23 +33,23 @@ int main() {
         std::cout << "]" << std::endl;
     }
 */
-    /*
+
 
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
             {117938010, 4444},  // Skagen
             {162089319, 1337}, // Copenhagen
     };
-     */
 
 
 
 
+  /*
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
             //{46923267, 1337}, // Schaan
             {43327662, 4444},  // Balzers
             {437322836, 9999}, //Mauren
     };
-
+*/
 
 
     ParallelDijkstra(dijkstraGraph, starting_nodes);

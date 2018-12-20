@@ -7,7 +7,7 @@
 #include "PostgreSQLLoader.h"
 #include "DijkstraNode.h"
 
-std::string PostgreSQLLoader::db_name = "gis_liechtenstein";
+std::string PostgreSQLLoader::db_name = "gis_denmark";
 std::string PostgreSQLLoader::user_name = "michel";
 
 PostgreSQLLoader::PostgreSQLLoader() {
