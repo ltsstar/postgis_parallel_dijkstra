@@ -133,7 +133,7 @@ void PostgreSQLLoader::insertPostgresLine(DijkstraNode* first_node, DijkstraNode
         double x2 = second_node->wgs84_lat();
 
         sprintf(query_str,
-                "insert into dijkstra_lines VALUES (%d, %d, %d,"
+                "insert into dijkstra_lines_akut VALUES (%d, %d, %d,"
                 "ST_SetSRID(ST_MakeLine(ST_Point(%lf, %lf), ST_Point(%lf, %lf)), 4326)"
                 ");",
                 first_node->id.osm_id, first_node->id.sub_id, first_node->dijkstra_class,

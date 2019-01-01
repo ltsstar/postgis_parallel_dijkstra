@@ -34,12 +34,12 @@ int main() {
     }
 */
 
-
+/*
     std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
             {117938010, 4444},  // Skagen
             {162089319, 1337}, // Copenhagen
     };
-
+*/
 
 
 
@@ -50,6 +50,21 @@ int main() {
             {437322836, 9999}, //Mauren
     };
 */
+
+  /*
+   Begin: AkutModtagelse København
+   */
+  std::vector<std::pair<int64_t, uint32_t>> starting_nodes = {
+          {191586964, 1}, // Bispebjerg
+          {604237532, 2}, // Gentofte Hospitalet
+          {237356626, 3}, // Frederiksberg Hospital
+          {601110074, 4}, // Hvidovre Hospital
+          {206083837, 5}, // Amager Hospital
+  };
+
+  /*
+   End: AkutModtagelse København
+   */
 
 
     ParallelDijkstra(dijkstraGraph, starting_nodes);
